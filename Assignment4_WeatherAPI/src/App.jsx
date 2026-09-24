@@ -1,8 +1,6 @@
 import {useState} from "react";
 import "./App.css";
 
-const API_KEY=import.meta.env.VITE_OPENWEATHER_API_KEY;
-
 export default function App(){
  const [city,setCity]=useState("");
  const [weather,setWeather]=useState(null);
@@ -10,13 +8,13 @@ export default function App(){
  const [error,setError]=useState("");
 
  async function search(){
-   if(!city){setError("Please enter a city");return}
-   if(!API_KEY){setError("Weather API key is not configured");return}
+   if(!city.trim()){setError("Please enter a city");return}
    setLoading(true);setError("");setWeather(null);
    try{
-     const r=await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`);
-     if(!r.ok) throw new Error("City not found");
-     const d=await r.json();setWeather(d);
+     const r=await fetch(`/api/weather?city=${encodeURIComponent(city.trim())}`);
+     const d=await r.json();
+     if(!r.ok) throw new Error(d.error || "Unable to fetch weather");
+     setWeather(d);
    }catch(e){setError(e.message)}
    finally{setLoading(false)}
  }
